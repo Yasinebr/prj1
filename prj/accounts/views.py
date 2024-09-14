@@ -3,7 +3,7 @@ from django.views import View
 from .forms import UserRegisterForm, UserLoginForm
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 
 class RegisterView(View):
@@ -37,8 +37,15 @@ class LoginView(View):
             cd = form.cleaned_data
             user = authenticate(username=cd['username'], password=cd['password'])
             if user is not None:
+                login(request, user)
                 messages.success(request, 'Login Successfully', 'success')
                 return redirect('home:home')
             messages.error(request, 'username or password is wring', 'warning')
         return render(request, self.template_name, {'form':form})
+
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        messages.success(request, 'logout successfully', 'success')
+        return redirect('home:home')
 
