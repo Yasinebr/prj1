@@ -61,6 +61,6 @@ class LogoutView(LoginRequiredMixin ,View):
         return redirect('home:home')
 
 class ProfileView(LoginRequiredMixin ,View):
-    def get(self, request, user_id):
+    def get(self, request ,user_id):
         user = User.objects.get(pk=user_id)
         return render(request, 'accounts/profile.html', {'user':user})
