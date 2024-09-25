@@ -4,7 +4,7 @@ from django.views import View
 from post.models import Post
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from post.forms import PostUpdateForm
+from post.forms import PostCreateUpdateForm
 from django.utils.text import slugify
 
 class HomeView(View):
@@ -29,7 +29,7 @@ class DeletePostView(LoginRequiredMixin, View):
             return redirect('home:home')
 
 class UpdatePostView(LoginRequiredMixin, View):
-    form_class = PostUpdateForm
+    form_class = PostCreateUpdateForm
     template_name = 'home/update.html'
 
     def setup(self, request, *args, **kwargs):
@@ -60,3 +60,24 @@ class UpdatePostView(LoginRequiredMixin, View):
         else:
             messages.error(request, 'invalid form', 'danger')
             return render(request, 'home/update.html', {'form':form})
+
+class CreatePostView(LoginRequiredMixin, View):
+    form_class = PostCreateUpdateForm
+    template_name = 'home/create.html'
+
+    def get(self, request , *args, **kwargs):
+        form = self.form_class
+        return render(request, self.template_name, {'form':form})
+
+    def post(self, request , *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new_post = form.save(commit=False)
+            new_post.slug = slugify(form.cleaned_data['body'][:30])
+            new_post.user = request.user
+            new_post.save()
+            messages.success(request, 'post created successfully', 'success')
+            return redirect('home:post', new_post.id, new_post.slug)
+        else:
+            messages.error(request, 'invalid form', 'danger')
+            return render(request, self.template_name, {'form':form})
