@@ -1,4 +1,3 @@
-from django.contrib.messages import success
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from post.models import Post
@@ -14,12 +13,12 @@ class HomeView(View):
 
 class PostDetailView(View):
     def get(self, request, post_id, post_slug):
-        post = get_object_or_404(pk=post_id, slug=post_slug)
+        post = get_object_or_404(Post,pk=post_id, slug=post_slug)
         return render(request, 'home/detail.html', {'post':post})
 
 class DeletePostView(LoginRequiredMixin, View):
     def get(self, request, post_id):
-        post = get_object_or_404(pk=post_id)
+        post = get_object_or_404(Post,pk=post_id)
         if post.user.id == request.user.id:
             post.delete()
             messages.success(request, 'post delete successfully', 'success')
@@ -33,7 +32,7 @@ class UpdatePostView(LoginRequiredMixin, View):
     template_name = 'home/update.html'
 
     def setup(self, request, *args, **kwargs):
-        self.post_class = get_object_or_404(pk=kwargs['post_id'])
+        self.post_class = get_object_or_404(Post,pk=kwargs['post_id'])
         return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -81,3 +80,4 @@ class CreatePostView(LoginRequiredMixin, View):
         else:
             messages.error(request, 'invalid form', 'danger')
             return render(request, self.template_name, {'form':form})
+

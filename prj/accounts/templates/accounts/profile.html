@@ -3,6 +3,10 @@
     <h2 class="text-center">{{ user.username }}</h2>
 
     {% if request.user.id == user.id %}
+        <a href="{% url 'accounts:reset' %}" class="btn btn-info">reset password</a>
+    {% endif %}
+
+    {% if request.user.id == user.id %}
         <a href="{% url 'home:post-create' %}" class="btn btn-primary">Create</a>
     {% endif %}
 
