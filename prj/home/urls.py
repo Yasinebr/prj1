@@ -8,5 +8,5 @@ urlpatterns =[
     path('post/delete/<int:post_id>', views.DeletePostView.as_view(), name='post-delete'),
     path('post/update/<int:post_id>', views.UpdatePostView.as_view(), name='post-update'),
     path('post/create', views.CreatePostView.as_view(), name='post-create'),
-
+    path('reply/<int:post_id>/<int:comment_id>', views.ReplyPostView.as_view(), name='add_reply')
 ]
