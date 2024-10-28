@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from post.models import Post, Comment
+from post.models import Post, Comment, Like
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from post.forms import PostCreateUpdateForm, CommentCreateForm, CommentReplyForm
@@ -23,7 +23,11 @@ class PostDetailView(View):
 
     def get(self, request, post_id, post_slug):
         comments = self.post_istance.pcomment.filter(is_reply=False)
-        return render(request, 'home/detail.html', {'post':self.post_istance, 'comments':comments, 'form':self.form_class, 'reply_form':self.form_class_reply})
+        can_like = False
+        if request.user.is_authenticated and self.post_istance.user_can_like(request.user):
+            can_like = True
+        return render(request, 'home/detail.html', {'post':self.post_istance, 'comments':comments,
+        'form':self.form_class, 'reply_form':self.form_class_reply, 'can_like':can_like})
 
     method_decorator(login_required)
     def post(self, request, *args, **kwargs):
@@ -117,3 +121,15 @@ class ReplyPostView(LoginRequiredMixin, View):
             reply.save()
             messages.success(request, 'post replayed successfully', 'success')
         return redirect('home:post', post.id, post.slug)
+
+class LikePostView(LoginRequiredMixin, View):
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        like = Like.objects.filter(post=post, user=request.user)
+        if like.exists() :
+            messages.error(request, 'You have already liked this post', 'danger')
+        else:
+            Like.objects.create(post=post, user=request.user)
+            messages.success(request, 'post liked successfully', 'success')
+        return redirect('home:post', post.id, post.slug)
+
