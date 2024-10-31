@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9tx#46!%bm@0hyld8)!$v=mk=kx_$jrs)xov%ib*y@hg@h9vb0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'prj.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'D:/prj1/prj/db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
