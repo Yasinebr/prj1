@@ -59,7 +59,7 @@ class LoginView(View):
                 if self.next:
                     return redirect(self.next)
                 return redirect('home:home')
-            messages.error(request, 'username or password is wring', 'warning')
+            messages.error(request, 'username or password is wrong', 'warning')
         return render(request, self.template_name, {'form':form})
 
 class LogoutView(LoginRequiredMixin ,View):
