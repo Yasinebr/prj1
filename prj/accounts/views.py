@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.views import View
-from .forms import UserRegisterForm, UserLoginForm
+from .forms import UserRegisterForm, UserLoginForm, EditProfileForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -114,3 +114,19 @@ class UserUnfollowView(LoginRequiredMixin, View):
         else:
             messages.error(request, 'You not following this user', 'danger')
         return redirect('accounts:profile', user.id)
+
+class EditProfileView(LoginRequiredMixin, View):
+    form_class = EditProfileForm
+
+    def get(self, request):
+        form = self.form_class(instance=request.user.profile, initial={'email':request.user.email})
+        return render(request, 'accounts/edit_profile.html', {'form':form})
+
+    def post(self, request):
+        form = self.form_class(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            messages.success(request, 'Your profile has been updated', 'success')
+        return redirect('accounts:profile', request.user.id)
